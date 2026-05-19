@@ -21,7 +21,7 @@
   
   <assets>
     <spriteSheet>assets/sprites/characters/character1.png</spriteSheet>
-    <background>assets/sprites/environment/grassbackground1.png</background>
+    <background>assets/sprites/environment/topexitcrustI.png</background>
   </assets>
   
   <animation>

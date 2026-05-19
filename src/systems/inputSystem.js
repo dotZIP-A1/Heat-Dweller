@@ -1,19 +1,32 @@
-export const keyMap = {
-  ArrowLeft: 'left',
+const movementKeyMap = {
   KeyA: 'left',
-  ArrowRight: 'right',
   KeyD: 'right',
-  ArrowUp: 'up',
   KeyW: 'up',
-  ArrowDown: 'down',
   KeyS: 'down',
+};
+
+const attackKeyMap = {
+  ArrowLeft: 'left',
+  ArrowRight: 'right',
+  ArrowUp: 'up',
+  ArrowDown: 'down',
 };
 
 export function setInput(game, event, value) {
   if (game.gameState === 'title') return;
-  const mappedKey = keyMap[event.code];
-  if (!mappedKey) return;
-  game.input[mappedKey] = value;
+
+  const movementKey = movementKeyMap[event.code];
+  if (movementKey) {
+    game.input[movementKey] = value;
+    return;
+  }
+
+  const attackDirection = attackKeyMap[event.code];
+  if (attackDirection && value) {
+    if (typeof game.startAttack === 'function') {
+      game.startAttack(attackDirection);
+    }
+  }
 }
 
 export function attachInputHandlers(game) {
