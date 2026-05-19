@@ -1,0 +1,21 @@
+{
+  "name": "echo-of-the-void",
+  "version": "1.0.0",
+  "description": "A roguelike open-world space exploration game where you repair your ship, travel across planets, and survive RNG-based galaxies.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dotZIP-A1/Echo-of-the-Void.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dotZIP-A1/Echo-of-the-Void/issues"
+  },
+  "homepage": "https://github.com/dotZIP-A1/Echo-of-the-Void#readme"
+}
