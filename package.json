@@ -2,8 +2,10 @@
   "name": "echo-of-the-void",
   "version": "1.0.0",
   "description": "A roguelike open-world space exploration game where you repair your ship, travel across planets, and survive RNG-based galaxies.",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --windows",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -14,6 +16,23 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "devDependencies": {
+    "electron": "^26.6.10",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.dotzip.echoofthevoid",
+    "productName": "Echo of the Void",
+    "asar": false,
+    "files": [
+      "**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  },
   "bugs": {
     "url": "https://github.com/dotZIP-A1/Echo-of-the-Void/issues"
   },

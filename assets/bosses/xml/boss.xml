@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<boss>
+  <name>Rob the Traitor</name>
+  <id>1</id>
+  <description>The cult leader who turned the bliblings against Matthew</description>
+  <rarity>legendary</rarity>
+  
+  <stats>
+    <health>500</health>
+    <maxHealth>500</maxHealth>
+    <damage>45</damage>
+    <attackSpeed>0.7</attackSpeed>
+    <defense>25</defense>
+    <speed>120</speed>
+  </stats>
+  
+  <position>
+    <x>800</x>
+    <y>150</y>
+    <width>96</width>
+    <height>96</height>
+  </position>
+  
+  <abilities>
+    <ability id="1" name="Cult Summon" damage="0" effect="Summons 3 cult minions"/>
+    <ability id="2" name="Dark Surge" damage="60" effect="Area attack that hits all nearby enemies"/>
+    <ability id="3" name="Void Strike" damage="85" effect="Single powerful attack"/>
+  </abilities>
+  
+  <drops>
+    <item id="9" name="Void Essence" rarity="legendary" chance="100"/>
+    <item id="8" name="Crystal Amulet" rarity="rare" chance="50"/>
+    <item id="5" name="Steel Sword" rarity="uncommon" chance="75"/>
+  </drops>
+  
+  <animation>
+    <idleFrames>2</idleFrames>
+    <attackFrames>5</attackFrames>
+    <hurtFrames>2</hurtFrames>
+  </animation>
+</boss>
