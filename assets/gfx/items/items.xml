@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<items>
+
+<item 
+    id="1"
+    name="Burnt Strawberry"
+    description="Smells like my dad!"
+    type="Passive"
+    quality="4"
+    itempool="fridge"
+    image="assets/gfx/items/passive/burnt_strawberry.png"
+    damage="2"
+    health="1"
+/>
+
+<item 
+    id="2"
+    name="Rotten Apple"
+    description="It has a worm in it!"
+    type="Active"
+    quality="2"
+    itempool="fridge"
+    image="assets/gfx/items/active/rotten_apple.png"
+    activeeffect="poison"
+/>
+
+<item 
+    id="3"
+    name="Wet Sock"
+    description="Gleams in the dark!"
+    type="Passive"
+    quality="3"
+    itempool="fridge"
+    image="assets/gfx/items/passive/wet_sock.png"
+    speed="1"
+    damage="-1"
+/>
+
+<item 
+    id="4"
+    name="Dusty Tome"
+    description="The webs are all over my face!"
+    type="Passive"
+    quality="0"
+    itempool="fridge"
+    image="assets/gfx/items/passive/dusty_tome.png"
+    speed="-1"
+/>
+
+<item 
+    id="5"
+    name="Mysterious Key"
+    description="Opens doors to the unknown..."
+    type="Passive"
+    quality="4"
+    itempool="fridge"
+    image="assets/gfx/items/passive/mysterious_key.png"
+    luck="2"
+/>
+
+</items>

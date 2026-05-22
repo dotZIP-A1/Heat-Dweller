@@ -139,7 +139,7 @@
  "meta": {
   "app": "https://github.com/LibreSprite/LibreSprite/",
   "version": "1.1-dev",
-  "image": "C:\\Users\\Ahmed\\Documents\\GitHub\\Echo-of-the-Void\\assets\\sprites\\characters\\character1.png",
+  "image": "C:\\Users\\Ahmed\\Documents\\GitHub\\heat-dweller\\assets\\sprites\\characters\\character1.png",
   "format": "RGBA8888",
   "size": { "w": 1088, "h": 64 },
   "scale": "1",

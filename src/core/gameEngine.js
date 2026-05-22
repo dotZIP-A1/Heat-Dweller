@@ -3,7 +3,7 @@ import { hideTitleScreen } from '../scenes/titleScene.js';
 import { drawSpriteFrame } from '../systems/renderSystem.js';
 import { loadConfigXml } from './configLoader.js';
 
-// Echo of the Void - Main Game Engine
+// Heat Dweller - Main Game Engine
 // Loads XML config and Lua-inspired game logic
 
 export class GameEngine {

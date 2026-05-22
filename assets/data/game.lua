@@ -1,6 +1,6 @@
--- Echo of the Void - Game Logic
+-- Heat Dweller - Game Logic
 -- Main game state and logic in Lua
-
+Game = {}
 Game = {}
 Game.__index = Game
 

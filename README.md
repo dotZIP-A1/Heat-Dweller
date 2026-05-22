@@ -1,4 +1,4 @@
-# Echo of the Void: Beta Name & Description
+# Heat Dweller: Beta Name & Description
 
 A roguelike open-world space exploration game where you repair your ship, travel across planets, and survive RNG-based galaxies.
 

@@ -1,7 +1,4 @@
--- Echo of the Void - Boss System
--- Boss AI, stats, and behavior management
-
-Boss = {}
+-- Heat Dweller - Boss System
 Boss.__index = Boss
 
 function Boss.new(config)

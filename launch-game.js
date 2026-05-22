@@ -31,7 +31,7 @@ if (!launcher) {
 }
 
 const appArgs = ['.'];
-console.log('Launching Echo of the Void...');
+console.log('Launching Heat Dweller...');
 console.log(`Using Electron binary: ${launcher}`);
 
 const child = spawn(launcher, appArgs, {
