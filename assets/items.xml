@@ -8,42 +8,42 @@
     type="Passive"
     quality="4"
     itempool="fridge"
-    image="assets/gfx/items/passive/burnt_strawberry.png"
-    damage="2"
-    health="1"
+    image="assets/gfx/items/collectibles/collectibles_001_burntstrawberry.png"
+    damage="3"
+    health="2"
 />
 
 <item 
     id="2"
-    name="Rotten Apple"
-    description="It has a worm in it!"
-    type="Active"
-    quality="2"
+    name="Light Bulb"
+    description="Shine bright like a diamond!"
+    type="Passive"
+    quality="3"
     itempool="fridge"
-    image="assets/gfx/items/active/rotten_apple.png"
+    image="assets/gfx/items/collectibles/collectibles_002_lightbulb.png"
     activeeffect="poison"
 />
 
 <item 
     id="3"
     name="Wet Sock"
-    description="Gleams in the dark!"
+    description="Super Slippery!"
     type="Passive"
     quality="3"
     itempool="fridge"
-    image="assets/gfx/items/passive/wet_sock.png"
+    image="assets/gfx/items/collectibles/collectibles_003_wetsock.png"
     speed="1"
     damage="-1"
 />
 
 <item 
     id="4"
-    name="Dusty Tome"
+    name="Dead Spider"
     description="The webs are all over my face!"
     type="Passive"
     quality="0"
-    itempool="fridge"
-    image="assets/gfx/items/passive/dusty_tome.png"
+    itempool="roof"
+    image="assets/gfx/items/collectibles/collectibles_004_deadspider.png"
     speed="-1"
 />
 
@@ -54,7 +54,7 @@
     type="Passive"
     quality="4"
     itempool="fridge"
-    image="assets/gfx/items/passive/mysterious_key.png"
+    image="assets/gfx/items/collectibles/collectibles_005_mysteriouskey.png"
     luck="2"
 />
 

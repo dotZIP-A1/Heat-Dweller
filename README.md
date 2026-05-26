@@ -1,6 +1,6 @@
-# Heat Dweller: Beta Name & Description
+# Heat Dweller
 
-A roguelike open-world space exploration game where you repair your ship, travel across planets, and survive RNG-based galaxies.
+A close-to-home rougelike game where you travel through your house as different characters, surive RNG situations where no exact playthrough is the same, and uncover the mystery behind the arsonist.
 
 ---
 
@@ -23,4 +23,4 @@ Early development — systems are being built and may change a lot.
 ---
 
 ## Dev Note
-More features soon boi
+More features soon boiiii
