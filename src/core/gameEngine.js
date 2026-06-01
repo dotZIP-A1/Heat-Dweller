@@ -2,6 +2,15 @@ import { attachInputHandlers } from '../systems/inputSystem.js';
 import { hideTitleScreen } from '../scenes/titleScene.js';
 import { drawSpriteFrame } from '../systems/renderSystem.js';
 import { loadConfigXml } from './configLoader.js';
+import { loadHudAssets, drawHud } from '../systems/hudSystem.js';
+import { generateRoomGraph, debugPrintRoomGraph } from '../systems/mapGenerator.js';
+
+const ROOM_TYPE_BACKGROUNDS = {
+  normal: 'resources/sprites/environment/topexitcrustI.png',
+  shop: 'resources/sprites/environment/topexitcrustI.png',
+  boss: 'resources/sprites/environment/allexitcrustI.png',
+  special: 'resources/sprites/environment/allexitcrustI.png',
+};
 
 // Heat Dweller - Main Game Engine
 // Loads XML config and Lua-inspired game logic
@@ -13,8 +22,7 @@ export class GameEngine {
     this.gameState = 'title';
     this.lastTime = performance.now();
     
-    // Initialize stats panel
-    this.initStatsPanels();
+    this.hudAssets = null;
     
     // Game state
     this.config = null;
@@ -35,25 +43,7 @@ export class GameEngine {
     // resources
     this.spriteSheet = {
       image: new Image(),
-      frames: [
-        { x: 0, y: 0, w: 64, h: 64 },
-        { x: 64, y: 0, w: 64, h: 64 },
-        { x: 128, y: 0, w: 64, h: 64 },
-        { x: 192, y: 0, w: 64, h: 64 },
-        { x: 256, y: 0, w: 64, h: 64 },
-        { x: 320, y: 0, w: 64, h: 64 },
-        { x: 384, y: 0, w: 64, h: 64 },
-        { x: 448, y: 0, w: 64, h: 64 },
-        { x: 512, y: 0, w: 64, h: 64 },
-        { x: 576, y: 0, w: 64, h: 64 },
-        { x: 640, y: 0, w: 64, h: 64 },
-        { x: 704, y: 0, w: 64, h: 64 },
-        { x: 768, y: 0, w: 64, h: 64 },
-        { x: 832, y: 0, w: 64, h: 64 },
-        { x: 896, y: 0, w: 64, h: 64 },
-        { x: 960, y: 0, w: 64, h: 64 },
-        { x: 1024, y: 0, w: 64, h: 64 },
-      ],
+      atlas: null,
       loaded: false,
     };
     
@@ -66,7 +56,7 @@ export class GameEngine {
       ],
       loaded: false,
     };
-    this.swordSheet.image.src = 'resources/sprites/attack/sword/spritesheet/defaultsword.png';
+    this.swordSheet.image.src = 'resources/gfx/projectiles/defaultsword/spritesheet/defaultsword.png';
     this.swordSheet.image.onload = () => { this.swordSheet.loaded = true; };
 
     this.swordSwingAudio = new Audio('resources/audio/sfx/swordswing.ogg');
@@ -88,7 +78,7 @@ export class GameEngine {
     this.enemySpriteSheets.angryredguy.image.onload = () => {
       this.enemySpriteSheets.angryredguy.loaded = true;
     };
-    this.enemySpriteSheets.angryredguy.image.src = 'resources/sprites/enemies/angryredguy/angryredguy.png';
+    this.enemySpriteSheets.angryredguy.image.src = 'resources/gfx/enemies/angryredguy/angryredguy.png';
     this.loadEnemySpriteSheets();
 
     this.backgroundImage = {
@@ -105,86 +95,44 @@ export class GameEngine {
     this.backgroundImage.ctx = this.backgroundImage.canvas.getContext('2d');
     this.roomTransitionCooldown = 0;
     this.roomEnemies = [];
+    this.roomGraph = null;
+    this.currentRoomId = null;
+    this.roomStates = {};
+    this.transition = {
+      active: false,
+      phase: 'none',
+      alpha: 0,
+      duration: 0.24,
+      nextRoomId: null,
+      entryDirection: null,
+    };
+    
+    this.unlockedCharacters = {
+      matthew: true,
+      stella: false,
+    };
+    this.selectedCharacterIndex = 0;
+    this.characterSelection = [
+      {
+        id: 'matthew',
+        name: 'Matthew',
+        portrait: 'resources/gfx/characters/character_001_matthew.png',
+        lockText: null,
+      },
+      {
+        id: 'stella',
+        name: 'Stella',
+        portrait: 'resources/gfx/characters/character_002_stella.png',
+        lockText: 'Beat the Attic for the first time to unlock',
+      },
+    ];
+    this.loadedPortraits = {};
     
     // Items inventory
     this.inventory = [];
     this.itemDatabase = this.getItemDatabase();
   }
   
-  initStatsPanels() {
-    // Left stats panel
-    const leftPanel = document.getElementById('leftStatsPanel');
-    if (!leftPanel) {
-      const panel = document.createElement('div');
-      panel.id = 'leftStatsPanel';
-      panel.style.cssText = `
-        position: absolute;
-        left: 16px;
-        top: 16px;
-        width: 200px;
-        background: rgba(10, 12, 18, 0.95);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: 16px;
-        font-family: Inter, system-ui, sans-serif;
-        font-size: 13px;
-        color: #e8e8e8;
-        z-index: 100;
-        display: none;
-      `;
-      document.body.appendChild(panel);
-    }
-  }
-  
-  updateStatsPanels() {
-    const panel = document.getElementById('leftStatsPanel');
-    if (!panel) return;
-    
-    if (this.gameState !== 'playing') {
-      panel.style.display = 'none';
-      return;
-    }
-    
-    panel.style.display = 'block';
-    panel.innerHTML = `
-      <div style="margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
-        <div style="font-weight: 600; margin-bottom: 4px;">Matthew</div>
-        <div style="font-size: 12px; color: #9da5b4;">Level ${this.stats.level}</div>
-      </div>
-      <div style="margin-bottom: 12px;">
-        <div style="color: #9da5b4; font-size: 11px; margin-bottom: 2px;">Health</div>
-        <div style="background: rgba(255,255,255,0.05); border-radius: 4px; height: 16px; overflow: hidden;">
-          <div style="background: #4ade80; height: 100%; width: ${(this.stats.health / this.stats.maxHealth) * 100}%;">
-          </div>
-        </div>
-        <div style="font-size: 11px; color: #9da5b4; margin-top: 2px;">${this.stats.health}/${this.stats.maxHealth}</div>
-      </div>
-      <div style="margin-bottom: 12px;">
-      <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 12px 0;">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
-        <div>
-          <div style="color: #9da5b4; margin-bottom: 2px;">⚔️ Damage</div>
-          <div style="color: #fbbf24;">${this.stats.damage}</div>
-        </div>
-        <div>
-          <div style="color: #9da5b4; margin-bottom: 2px;">⚡ Atk Speed</div>
-          <div style="color: #fbbf24;">${this.stats.attackSpeed.toFixed(1)}x</div>
-        </div>
-        <div>
-          <div style="color: #9da5b4; margin-bottom: 2px;">🛡️ Defense</div>
-          <div style="color: #4ade80;">${this.stats.defense}</div>
-        </div>
-        <div>
-          <div style="color: #9da5b4; margin-bottom: 2px;">💨 Speed</div>
-          <div style="color: #4ade80;">${this.stats.speed}</div>
-        </div>
-        <div>
-          <div style="color: #9da5b4; margin-bottom: 2px;">✨ EXP</div>
-          <div style="color: #a78bfa;">${this.stats.experience}</div>
-        </div>
-      </div>
-    `;
-  }
   
   async loadConfig() {
     try {
@@ -218,8 +166,8 @@ export class GameEngine {
     this.player = {
       x: parseInt(getVal('player > startX', 800)),
       y: parseInt(getVal('player > startY', 600)),
-      width: parseInt(getVal('player > width', 64)),
-      height: parseInt(getVal('player > height', 64)),
+      width: 40,
+      height: 40,
       speed: parseInt(getVal('player > baseSpeed', 220)),
       facing: 'down',
       moving: false,
@@ -229,6 +177,7 @@ export class GameEngine {
       blinkDuration: parseFloat(getVal('animation > blinkDuration', 0.12)),
       nextBlink: Math.random() * 2 + 2,
       blinking: false,
+      character: 'matthew',
     };
     
     this.stats = {
@@ -243,9 +192,17 @@ export class GameEngine {
     };
     
     this.animation = {
-      idle: 2,
-      walkHorizontal: [3, 4, 5, 6, 7, 8, 9],
-      walkVertical: [11, 12, 13, 14, 15, 16],
+      heads: {
+        forward: 'head_forward_1',
+        right: 'head_right_1',
+        back: 'head_back_1',
+      },
+      body: {
+        idle: 'body_idle',
+        walk_down: ['walk_down_0', 'walk_down_1', 'walk_down_2', 'walk_down_3', 'walk_down_4'],
+        walk_right: ['walk_right_0', 'walk_right_1', 'walk_right_2', 'walk_right_3', 'walk_right_4', 'walk_right_5'],
+        hurt: ['hurt_0', 'hurt_1', 'hurt_2', 'hurt_3'],
+      },
     };
     
     this.camera = {
@@ -254,21 +211,12 @@ export class GameEngine {
       width: this.canvas.clientWidth,
       height: this.canvas.clientHeight,
     };
-    
-    // Load resources
-    const spriteSheetPath = getVal('resources > spriteSheet', 'resources/sprites/characters/character1.png');
-    const backgroundPath = getVal('resources > background', 'resources/sprites/environment/topexitcrustI.png');
-    const layouts = [...new Set([
-      backgroundPath,
-      'resources/sprites/environment/topexitcrustI.png',
-      'resources/sprites/environment/allexitcrustI.png',
-    ])];
 
-    this.backgroundImage.layouts = layouts;
-    this.loadRandomRoom();
-
-    this.spriteSheet.image.src = spriteSheetPath;
-    this.spriteSheet.image.onload = () => { this.spriteSheet.loaded = true; };
+    this.roomStates = {};
+    this.backgroundImage.layouts = [
+      'resources/gfx/sprites/environment/topexitcrustI.png',
+      'resources/gfx/sprites/environment/allexitcrustI.png',
+    ];
   }
   
   initGameStateDefault() {
@@ -283,8 +231,8 @@ export class GameEngine {
     this.player = {
       x: 800,
       y: 600,
-      width: 64,
-      height: 64,
+      width: 40,
+      height: 40,
       speed: 220,
       facing: 'down',
       moving: false,
@@ -308,9 +256,17 @@ export class GameEngine {
     };
     
     this.animation = {
-      idle: 2,
-      walkHorizontal: [3, 4, 5, 6, 7, 8, 9],
-      walkVertical: [11, 12, 13, 14, 15, 16],
+      heads: {
+        forward: 'head_forward_1',
+        right: 'head_right_1',
+        back: 'head_back_1',
+      },
+      body: {
+        idle: 'body_idle',
+        walk_down: ['walk_down_0', 'walk_down_1', 'walk_down_2', 'walk_down_3', 'walk_down_4'],
+        walk_right: ['walk_right_0', 'walk_right_1', 'walk_right_2', 'walk_right_3', 'walk_right_4', 'walk_right_5'],
+        hurt: ['hurt_0', 'hurt_1', 'hurt_2', 'hurt_3'],
+      },
     };
     
     this.camera = {
@@ -320,14 +276,12 @@ export class GameEngine {
       height: this.canvas.clientHeight,
     };
     
-    this.spriteSheet.image.src = 'resources/sprites/characters/character1.png';
-    this.spriteSheet.image.onload = () => { this.spriteSheet.loaded = true; };
-
+    this.loadCharacterAtlas();
+    this.roomStates = {};
     this.backgroundImage.layouts = [
-      'resources/sprites/environment/topexitcrustI.png',
-      'resources/sprites/environment/allexitcrustI.png',
+      'resources/gfx/sprites/environment/topexitcrustI.png',
+      'resources/gfx/sprites/environment/allexitcrustI.png',
     ];
-    this.loadRandomRoom();
   }
   
   getItemDatabase() {
@@ -444,6 +398,12 @@ export class GameEngine {
     }
 
     this.roomEnemies = this.roomEnemies.filter(e => e.alive);
+    if (this.currentRoomId !== null) {
+      const roomInfo = this.roomGraph?.rooms.find(room => room.id === this.currentRoomId);
+      if (roomInfo?.type === 'boss' && this.roomEnemies.length === 0) {
+        this.unlockCharacter('stella');
+      }
+    }
   }
 
   getAttackHitbox() {
@@ -543,7 +503,7 @@ export class GameEngine {
       : layouts[Math.floor(Math.random() * layouts.length)];
 
     this.loadRoomImage(nextLayout);
-    this.generateRoomEnemies();
+    this.roomEnemies = this.generateRoomEnemies();
   }
 
   generateRoomEnemies() {
@@ -553,7 +513,7 @@ export class GameEngine {
     const height = this.camera.height;
     const enemyTypes = ['angryredguy', 'spider'];
 
-    this.roomEnemies = Array.from({ length: count }, (_, index) => {
+    return Array.from({ length: count }, (_, index) => {
       const type = enemyTypes[index % enemyTypes.length];
       return {
         type,
@@ -601,31 +561,150 @@ export class GameEngine {
 
   checkRoomTransition() {
     if (this.roomEnemies.some(e => e.alive)) return;
-    if (!this.backgroundImage.loaded || this.roomTransitionCooldown > 0) return;
+    if (this.roomTransitionCooldown > 0) return;
+    if (!this.roomGraph || this.currentRoomId === null) return;
 
-    const samplePoints = [
-      { x: this.player.x, y: this.player.y + this.player.height / 2 - 4 },
-      { x: this.player.x - this.player.width / 4, y: this.player.y + this.player.height / 2 - 4 },
-      { x: this.player.x + this.player.width / 4, y: this.player.y + this.player.height / 2 - 4 },
-    ];
+    const exitDirection = this.getExitDirection();
+    if (!exitDirection) return;
 
-    const width = this.camera.width;
-    const height = this.camera.height;
+    const currentRoom = this.roomGraph.rooms.find(room => room.id === this.currentRoomId);
+    if (!currentRoom) return;
 
-    for (const point of samplePoints) {
-      const imageX = Math.floor((point.x / width) * this.backgroundImage.canvas.width);
-      const imageY = Math.floor((point.y / height) * this.backgroundImage.canvas.height);
-      const pixel = this.getRoomPixelColor(imageX, imageY);
-      if (!pixel) continue;
-      if (pixel.r === 0 && pixel.g === 0 && pixel.b === 0 && pixel.a !== 0) {
-        this.loadRandomRoom();
-        const spawn = this.findSafeRoomPosition();
-        this.player.x = spawn.x;
-        this.player.y = spawn.y;
-        this.roomTransitionCooldown = 0.5;
-        return;
+    const nextRoomId = currentRoom.connections[exitDirection];
+    if (nextRoomId === null || nextRoomId === undefined) return;
+
+    this.beginRoomTransition(nextRoomId, this.getOppositeDirection(exitDirection));
+  }
+
+  getOppositeDirection(direction) {
+    const opposite = {
+      north: 'south',
+      south: 'north',
+      east: 'west',
+      west: 'east',
+    };
+    return opposite[direction] || null;
+  }
+
+  getExitDirection() {
+    const threshold = 8;
+    const leftEdge = this.player.x - this.player.width / 2 <= threshold;
+    const rightEdge = this.player.x + this.player.width / 2 >= this.world.width - threshold;
+    const topEdge = this.player.y - this.player.height / 2 <= threshold;
+    const bottomEdge = this.player.y + this.player.height / 2 >= this.world.height - threshold;
+
+    if (topEdge) return 'north';
+    if (bottomEdge) return 'south';
+    if (leftEdge) return 'west';
+    if (rightEdge) return 'east';
+    return null;
+  }
+
+  findRoomEntryPosition(direction) {
+    switch (direction) {
+      case 'north':
+        return { x: this.world.width / 2, y: this.world.height - this.player.height };
+      case 'south':
+        return { x: this.world.width / 2, y: this.player.height };
+      case 'west':
+        return { x: this.world.width - this.player.width, y: this.world.height / 2 };
+      case 'east':
+        return { x: this.player.width, y: this.world.height / 2 };
+      default:
+        return { x: this.world.width / 2, y: this.world.height / 2 };
+    }
+  }
+
+  beginRoomTransition(nextRoomId, entryDirection) {
+    if (this.transition.active || this.roomTransitionCooldown > 0) return;
+    this.transition.active = true;
+    this.transition.phase = 'out';
+    this.transition.alpha = 0;
+    this.transition.nextRoomId = nextRoomId;
+    this.transition.entryDirection = entryDirection;
+    this.roomTransitionCooldown = 0.5;
+  }
+
+  updateRoomTransition(delta) {
+    if (!this.transition.active) return;
+
+    const speed = delta / this.transition.duration;
+    if (this.transition.phase === 'out') {
+      this.transition.alpha = Math.min(1, this.transition.alpha + speed);
+      if (this.transition.alpha >= 1) {
+        this.performRoomSwitch();
+        this.transition.phase = 'in';
+      }
+    } else if (this.transition.phase === 'in') {
+      this.transition.alpha = Math.max(0, this.transition.alpha - speed);
+      if (this.transition.alpha <= 0) {
+        this.transition.active = false;
+        this.transition.phase = 'none';
       }
     }
+  }
+
+  performRoomSwitch() {
+    const nextRoomId = this.transition.nextRoomId;
+    const entryDirection = this.transition.entryDirection;
+    if (nextRoomId === null || nextRoomId === undefined) return;
+    this.enterRoom(nextRoomId, entryDirection);
+  }
+
+  createRoomState(roomId) {
+    const roomInfo = this.roomGraph?.rooms.find(room => room.id === roomId) || null;
+    const roomType = roomInfo?.type || 'normal';
+    return {
+      roomId,
+      visited: false,
+      cleared: false,
+      type: roomType,
+      enemies: this.generateRoomEnemies(),
+      items: [],
+      backgroundLayout: ROOM_TYPE_BACKGROUNDS[roomType] || ROOM_TYPE_BACKGROUNDS.normal,
+    };
+  }
+
+  getRoomState(roomId) {
+    if (!this.roomStates[roomId]) {
+      this.roomStates[roomId] = this.createRoomState(roomId);
+    }
+    return this.roomStates[roomId];
+  }
+
+  enterRoom(roomId, entryDirection = null) {
+    if (!this.roomGraph) return;
+    const roomInfo = this.roomGraph.rooms.find(room => room.id === roomId);
+    if (!roomInfo) return;
+
+    this.currentRoomId = roomId;
+    const roomState = this.getRoomState(roomId);
+    roomState.visited = true;
+
+    const layout = roomState.backgroundLayout;
+    this.backgroundImage.layouts = [layout];
+    this.loadRoomImage(layout);
+
+    this.roomEnemies = roomState.cleared ? [] : roomState.enemies;
+
+    if (entryDirection) {
+      const spawn = this.findRoomEntryPosition(entryDirection);
+      this.player.x = spawn.x;
+      this.player.y = spawn.y;
+    } else {
+      const spawn = this.findSafeRoomPosition();
+      this.player.x = spawn.x;
+      this.player.y = spawn.y;
+    }
+  }
+
+  drawRoomTransition() {
+    if (!this.transition.active) return;
+    this.ctx.save();
+    this.ctx.globalAlpha = this.transition.alpha;
+    this.ctx.fillStyle = '#000000';
+    this.ctx.fillRect(0, 0, this.camera.width, this.camera.height);
+    this.ctx.restore();
   }
 
   updateEnemies(delta) {
@@ -661,6 +740,11 @@ export class GameEngine {
     }
 
     this.roomEnemies = this.roomEnemies.filter(e => e.alive);
+    if (this.currentRoomId !== null) {
+      const roomState = this.getRoomState(this.currentRoomId);
+      roomState.enemies = this.roomEnemies;
+      roomState.cleared = this.roomEnemies.length === 0;
+    }
   }
 
   updateChaserEnemy(enemy, delta) {
@@ -720,7 +804,7 @@ export class GameEngine {
     }
   }
 
-  clamp(value, min, max) {
+  startAttack(direction) {
     if (this.gameState !== 'playing') return;
     if (this.attack.active) return;
 
@@ -779,13 +863,13 @@ export class GameEngine {
 
   async loadEnemySpriteSheets() {
     try {
-      const response = await fetch('resources/sprites/enemies/spider/spider.json');
+      const response = await fetch('resources/gfx/enemies/json/entity_002_scar.json');
       const atlas = await response.json();
       this.enemySpriteSheets.spider.frames = this.parseSpriteAtlas(atlas);
       this.enemySpriteSheets.spider.image.onload = () => {
         this.enemySpriteSheets.spider.loaded = true;
       };
-      this.enemySpriteSheets.spider.image.src = 'resources/sprites/enemies/spider/spider.png';
+      this.enemySpriteSheets.spider.image.src = 'resources/gfx/enemies/spritesheets/entity_002_scar.png';
     } catch (err) {
       console.warn('Failed to load spider sprite atlas:', err);
     }
@@ -870,6 +954,11 @@ export class GameEngine {
   }
   
   update(delta) {
+    if (this.transition.active) {
+      this.updateRoomTransition(delta);
+      return;
+    }
+
     this.updateMovement(delta);
     this.updateAttack(delta);
     this.updateEnemies(delta);
@@ -889,12 +978,12 @@ export class GameEngine {
   
   getBodyFrame() {
     if (!this.player.moving) {
-      return this.animation.idle;
+      return this.animation.body.idle;
     }
     
-    let frames = this.animation.walkVertical;
+    let frames = this.animation.body.walk_down;
     if (this.player.facing === 'left' || this.player.facing === 'right') {
-      frames = this.animation.walkHorizontal;
+      frames = this.animation.body.walk_right;
     }
     
     const index = Math.floor(this.player.animationTime / this.player.frameSpeed) % frames.length;
@@ -902,27 +991,243 @@ export class GameEngine {
   }
   
   getHeadFrame() {
-    return this.player.blinking ? 1 : 0;
+    const headMap = {
+      up: 'back',
+      down: 'forward',
+      left: 'right',
+      right: 'right',
+    };
+    const headDir = headMap[this.player.facing] || 'forward';
+    let frameName = this.animation.heads[headDir];
+    
+    // Use blink variant if blinking
+    if (this.player.blinking) {
+      frameName = frameName.replace('_1', '_blink');
+    }
+    
+    return frameName;
   }
   
-  drawSpriteFrame(frameIndex, drawX, drawY, flip = false) {
-    drawSpriteFrame(this.ctx, this.spriteSheet, frameIndex, drawX, drawY, flip);
+  async loadCharacterAtlas() {
+    try {
+      const response = await fetch('resources/gfx/sprites/characters/character_001_matthew.json');
+      if (!response.ok) throw new Error(`Failed to load JSON: ${response.status}`);
+      this.spriteSheet.atlas = await response.json();
+      
+      // Wait for image to load
+      return new Promise((resolve) => {
+        this.spriteSheet.image.onload = () => { 
+          this.spriteSheet.loaded = true;
+          console.log('Character atlas and image loaded successfully');
+          resolve();
+        };
+        this.spriteSheet.image.onerror = () => {
+          console.error('Failed to load character image');
+          resolve();
+        };
+        this.spriteSheet.image.src = 'resources/gfx/sprites/characters/character_001_matthew.png';
+      });
+    } catch (err) {
+      console.error('Failed to load character atlas:', err);
+    }
+  }
+  
+  getFrameData(frameName) {
+    if (!this.spriteSheet.atlas || !this.spriteSheet.atlas.frames) {
+      if (!this.spriteSheet.loaded) {
+        return null; // Still loading
+      }
+      console.warn('Atlas not loaded or frames missing');
+      return null;
+    }
+    const frameData = this.spriteSheet.atlas.frames[frameName];
+    if (!frameData) {
+      console.warn(`Frame not found in atlas: ${frameName}`);
+      return null;
+    }
+    return frameData.frame;
+  }
+
+  getSelectedCharacter() {
+    return this.characterSelection[this.selectedCharacterIndex] || this.characterSelection[0];
+  }
+
+  isCharacterUnlocked(characterId) {
+    return Boolean(this.unlockedCharacters[characterId]);
+  }
+
+  changeSelection(direction) {
+    const count = this.characterSelection.length;
+    this.selectedCharacterIndex = (this.selectedCharacterIndex + direction + count) % count;
+  }
+
+  startCharacterSelect() {
+    if (this.gameState !== 'title') return;
+    this.gameState = 'characterSelect';
+    hideTitleScreen();
+  }
+
+  confirmCharacterSelection() {
+    const character = this.getSelectedCharacter();
+    if (!this.isCharacterUnlocked(character.id)) {
+      return;
+    }
+    if (!this.player) {
+      this.initGameState();
+    }
+    this.player.character = character.id;
+    this.startGame();
+  }
+
+  loadCharacterPortraits() {
+    this.characterSelection.forEach((character) => {
+      const image = new Image();
+      image.src = character.portrait;
+      this.loadedPortraits[character.id] = image;
+    });
+  }
+
+  loadPersistentFlags() {
+    try {
+      const saved = localStorage.getItem('heatdweller.unlockedCharacters');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        this.unlockedCharacters = {
+          ...this.unlockedCharacters,
+          ...parsed,
+        };
+      }
+    } catch (err) {
+      console.warn('Could not load persistent unlock flags:', err);
+    }
+  }
+
+  savePersistentFlags() {
+    try {
+      localStorage.setItem('heatdweller.unlockedCharacters', JSON.stringify(this.unlockedCharacters));
+    } catch (err) {
+      console.warn('Could not save persistent unlock flags:', err);
+    }
+  }
+
+  unlockCharacter(characterId) {
+    if (!this.unlockedCharacters[characterId]) {
+      this.unlockedCharacters[characterId] = true;
+      this.savePersistentFlags();
+    }
+  }
+
+  drawCharacterSelect() {
+    const width = this.canvas.clientWidth;
+    const height = this.canvas.clientHeight;
+    this.ctx.clearRect(0, 0, width, height);
+    this.ctx.fillStyle = '#07080c';
+    this.ctx.fillRect(0, 0, width, height);
+
+    this.ctx.fillStyle = '#eff2ff';
+    this.ctx.font = 'bold 32px Inter, system-ui, sans-serif';
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.fillText('Select Your Hero', width / 2, 80);
+
+    const centerX = width / 2;
+    const centerY = height / 2 + 20;
+    const spacing = 280;
+    const portraitSize = 220;
+
+    this.characterSelection.forEach((character, index) => {
+      const offset = index - this.selectedCharacterIndex;
+      const x = centerX + offset * spacing;
+      const isSelected = index === this.selectedCharacterIndex;
+      const scale = isSelected ? 1.0 : 0.72;
+      const portraitImage = this.loadedPortraits[character.id];
+
+      this.ctx.save();
+      this.ctx.globalAlpha = isSelected ? 1 : 0.55;
+      this.ctx.translate(x, centerY);
+      this.ctx.scale(scale, scale);
+      this.ctx.fillStyle = 'rgba(18, 22, 37, 0.85)';
+      this.ctx.fillRect(-portraitSize / 2 - 8, -portraitSize / 2 - 8, portraitSize + 16, portraitSize + 16);
+      if (portraitImage && portraitImage.complete) {
+        this.ctx.drawImage(portraitImage, -portraitSize / 2, -portraitSize / 2, portraitSize, portraitSize);
+      } else {
+        this.ctx.fillStyle = '#444';
+        this.ctx.fillRect(-portraitSize / 2, -portraitSize / 2, portraitSize, portraitSize);
+      }
+      this.ctx.restore();
+
+      this.ctx.fillStyle = '#e2e8f0';
+      this.ctx.font = `${isSelected ? 'bold 24px' : '18px'} Inter, system-ui, sans-serif`;
+      this.ctx.fillText(character.name, x, centerY + portraitSize / 2 + 40);
+
+      if (!this.isCharacterUnlocked(character.id)) {
+        this.ctx.fillStyle = 'rgba(255,255,255,0.85)';
+        this.ctx.font = '14px Inter, system-ui, sans-serif';
+        this.ctx.fillText(character.lockText, x, centerY + portraitSize / 2 + 70);
+      }
+    });
+
+    this.ctx.fillStyle = '#cbd5e1';
+    this.ctx.font = '16px Inter, system-ui, sans-serif';
+    this.ctx.fillText('Use A/D or arrow keys to choose. Press Enter to confirm.', width / 2, height - 40);
   }
 
   drawPlayer() {
-    const bodyFrameIndex = this.getBodyFrame();
-    const headFrameIndex = this.getHeadFrame();
+    if (!this.spriteSheet.loaded) {
+      // Show placeholder while loading
+      const drawX = this.player.x - this.player.width / 2;
+      const drawY = this.player.y - this.player.height / 2;
+      this.ctx.fillStyle = '#666666';
+      this.ctx.fillRect(drawX, drawY, this.player.width, this.player.height);
+      return;
+    }
+
+    const bodyFrameName = this.getBodyFrame();
+    const headFrameName = this.getHeadFrame();
+    const bodyFrame = this.getFrameData(bodyFrameName);
+    const headFrame = this.getFrameData(headFrameName);
+    
     const drawX = this.player.x - this.player.width / 2;
     const drawY = this.player.y - this.player.height / 2;
     const flip = this.player.facing === 'left';
     
-    if (this.spriteSheet.loaded) {
-      this.drawSpriteFrame(bodyFrameIndex, drawX, drawY, flip);
-      this.drawSpriteFrame(headFrameIndex, drawX, drawY, flip);
-      this.drawSwordAttack();
-    } else {
+    if (!bodyFrame || !headFrame) {
+      console.error(`Missing frame data: body=${bodyFrameName}, head=${headFrameName}`);
       this.ctx.fillStyle = '#e8e8e8';
       this.ctx.fillRect(drawX, drawY, this.player.width, this.player.height);
+      return;
+    }
+    
+    // Draw body first
+    this.drawAtlasFrame(bodyFrame, drawX, drawY, flip);
+    
+    // Draw head on top
+    this.drawAtlasFrame(headFrame, drawX, drawY, flip);
+    
+    this.drawSwordAttack();
+  }
+  
+  drawAtlasFrame(frameData, drawX, drawY, flip = false) {
+    if (!frameData) return;
+    
+    const { x, y, w, h } = frameData;
+    
+    if (flip) {
+      this.ctx.save();
+      this.ctx.translate(drawX + w, drawY);
+      this.ctx.scale(-1, 1);
+      this.ctx.drawImage(
+        this.spriteSheet.image,
+        x, y, w, h,
+        0, 0, w, h
+      );
+      this.ctx.restore();
+    } else {
+      this.ctx.drawImage(
+        this.spriteSheet.image,
+        x, y, w, h,
+        drawX, drawY, w, h
+      );
     }
   }
   
@@ -945,11 +1250,11 @@ export class GameEngine {
   }
   
   drawHUD() {
-    this.ctx.fillStyle = '#ffffffcc';
-    this.ctx.font = '14px Inter, system-ui, sans-serif';
-    this.ctx.fillText(`Position: ${Math.round(this.player.x)}, ${Math.round(this.player.y)}`, 16, 24);
-    this.ctx.fillText(`Facing: ${this.player.facing}`, 16, 44);
-    this.ctx.fillText('Use WASD to move, arrow keys to attack. Touch black to enter a new room.', 16, 64);
+    if (!this.hudAssets || !this.stats) {
+      return;
+    }
+
+    drawHud(this.ctx, this.hudAssets, this.stats, this.canvas);
   }
   
   resizeCanvas() {
@@ -971,32 +1276,52 @@ export class GameEngine {
       this.update(delta);
       this.drawWorld();
       this.drawHUD();
+      this.drawRoomTransition();
+    } else if (this.gameState === 'characterSelect') {
+      this.drawCharacterSelect();
     }
     
-    this.updateStatsPanels();
     requestAnimationFrame(this.loop);
   }
   
   setInput(event, value) {
-    if (this.gameState === 'title') return;
-    
-    switch (event.code) {
-      case 'ArrowLeft':
-      case 'KeyA':
-        this.input.left = value;
-        break;
-      case 'ArrowRight':
-      case 'KeyD':
-        this.input.right = value;
-        break;
-      case 'ArrowUp':
-      case 'KeyW':
-        this.input.up = value;
-        break;
-      case 'ArrowDown':
-      case 'KeyS':
-        this.input.down = value;
-        break;
+    if (this.gameState === 'playing') {
+      switch (event.code) {
+        case 'ArrowLeft':
+        case 'KeyA':
+          this.input.left = value;
+          break;
+        case 'ArrowRight':
+        case 'KeyD':
+          this.input.right = value;
+          break;
+        case 'ArrowUp':
+        case 'KeyW':
+          this.input.up = value;
+          break;
+        case 'ArrowDown':
+        case 'KeyS':
+          this.input.down = value;
+          break;
+      }
+      return;
+    }
+
+    if (this.gameState === 'characterSelect' && value) {
+      switch (event.code) {
+        case 'ArrowLeft':
+        case 'KeyA':
+          this.changeSelection(-1);
+          break;
+        case 'ArrowRight':
+        case 'KeyD':
+          this.changeSelection(1);
+          break;
+        case 'Enter':
+        case 'NumpadEnter':
+          this.confirmCharacterSelection();
+          break;
+      }
     }
   }
   
@@ -1009,7 +1334,15 @@ export class GameEngine {
   
   async init() {
     await this.loadConfig();
+    this.hudAssets = await loadHudAssets();
+    this.loadPersistentFlags();
+    this.roomGraph = generateRoomGraph();
+    debugPrintRoomGraph(this.roomGraph);
+    await this.loadCharacterAtlas();
+    this.loadCharacterPortraits();
     this.resizeCanvas();
+    this.roomStates = {};
+    this.enterRoom(this.roomGraph.startRoomId);
     
     attachInputHandlers(this);
     requestAnimationFrame(this.loop);

@@ -12,8 +12,42 @@ const attackKeyMap = {
   ArrowDown: 'down',
 };
 
+const menuLeftKeys = ['ArrowLeft', 'KeyA'];
+const menuRightKeys = ['ArrowRight', 'KeyD'];
+const menuConfirmKeys = ['Enter', 'NumpadEnter'];
+
 export function setInput(game, event, value) {
-  if (game.gameState === 'title') return;
+  if (game.gameState === 'title') {
+    if (value && menuConfirmKeys.includes(event.code)) {
+      if (typeof game.startCharacterSelect === 'function') {
+        game.startCharacterSelect();
+      }
+    }
+    return;
+  }
+
+  if (game.gameState === 'characterSelect') {
+    if (!value) return;
+
+    if (menuLeftKeys.includes(event.code)) {
+      game.changeSelection(-1);
+      return;
+    }
+
+    if (menuRightKeys.includes(event.code)) {
+      game.changeSelection(1);
+      return;
+    }
+
+    if (menuConfirmKeys.includes(event.code)) {
+      if (typeof game.confirmCharacterSelection === 'function') {
+        game.confirmCharacterSelection();
+      }
+      return;
+    }
+
+    return;
+  }
 
   const movementKey = movementKeyMap[event.code];
   if (movementKey) {
@@ -31,11 +65,6 @@ export function setInput(game, event, value) {
 
 export function attachInputHandlers(game) {
   window.addEventListener('keydown', (event) => {
-    if (event.code === 'Enter' && game.gameState === 'title') {
-      game.startGame();
-      return;
-    }
-
     setInput(game, event, true);
   });
 
@@ -51,6 +80,10 @@ export function attachInputHandlers(game) {
 
   const titleEl = document.getElementById('titleScreen');
   if (titleEl) {
-    titleEl.addEventListener('click', () => game.startGame());
+    titleEl.addEventListener('click', () => {
+      if (typeof game.startCharacterSelect === 'function') {
+        game.startCharacterSelect();
+      }
+    });
   }
 }

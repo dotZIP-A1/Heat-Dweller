@@ -28,6 +28,7 @@
       "**/*"
     ],
     "win": {
+      "icon": "conig_settings/heatdweller-ng.ico",
       "target": [
         "nsis"
       ]
