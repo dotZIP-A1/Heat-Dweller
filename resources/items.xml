@@ -8,7 +8,7 @@
     <!-- event: any quality -->
 <!-- Item Pools -->
 
-<!-- Item cooldowns are measured by the room charging. If it is a timed charge, add "timed" before cooldown. I.E: tcooldown="2.5" -->
+<!-- Item cooldowns are measured by the room charging. If it is a timed charge, add "timed" before cooldown. I.E: timedcooldown="2.5". Timed Cooldowns are mesaured in decimals, representing the time in seconds -->
 
 <item 
     id="1"
@@ -185,5 +185,16 @@
     itempool="secret,event,"
     image="resources/gfx/items/collectibles/collectibles_015_garlic.png"
     effect="Breathe on enemies and posion them for 5 seconds, dealing rapid tick damage which concludes to 5 damage per second."
+/>
+
+<item 
+    id="16"
+    name="Snowman"
+    description="Why is this thing still here? It doesn't even make sense!"
+    type="Active"
+    quality="1"
+    itempool="secret,event,"
+    image="resources/gfx/items/collectibles/collectibles_016_snowman.png"
+    active_effect="When taking damage, create a snowman familiar that shoots weak snowballs for 5 seconds."
 />
 </items>

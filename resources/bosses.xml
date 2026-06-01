@@ -8,7 +8,7 @@
         id="1"
         name="The Crawler"
         floor="Attic"
-        health="180"
+        health="300"
         damage="3"
         speed="1.0"
         difficulty="9"
@@ -18,10 +18,10 @@
         spritesheet="spritesheets/boss_001_thecrawler.png"
         spritesheetjson="json/boss_001_thecrawler.json"
 
-        music="boss_attic.ogg"
+        music="basement boss theme song.ogg"
         rewardpool="secret"
 
-        description="Its crawling everywhere! It can be found in the Attic, and it has a 100% chance to drop items from the secret item pool due to its difficulty."
+        description="Its crawling everywhere! This boss can be found in the Attic and the Basement. It has a chance to drop secret room items, and it has a chance to spawn in the secret room."
     />
 
 </bosses>
