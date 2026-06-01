@@ -32,7 +32,7 @@ export class GameEngine {
       hasHit: false,
     };
     
-    // Assets
+    // resources
     this.spriteSheet = {
       image: new Image(),
       frames: [
@@ -66,10 +66,10 @@ export class GameEngine {
       ],
       loaded: false,
     };
-    this.swordSheet.image.src = 'assets/sprites/attack/sword/spritesheet/defaultsword.png';
+    this.swordSheet.image.src = 'resources/sprites/attack/sword/spritesheet/defaultsword.png';
     this.swordSheet.image.onload = () => { this.swordSheet.loaded = true; };
 
-    this.swordSwingAudio = new Audio('assets/audio/sfx/swordswing.ogg');
+    this.swordSwingAudio = new Audio('resources/audio/sfx/swordswing.ogg');
     this.swordSwingAudio.volume = 0.5;
 
     this.enemySpriteSheets = {
@@ -88,15 +88,15 @@ export class GameEngine {
     this.enemySpriteSheets.angryredguy.image.onload = () => {
       this.enemySpriteSheets.angryredguy.loaded = true;
     };
-    this.enemySpriteSheets.angryredguy.image.src = 'assets/sprites/enemies/angryredguy/angryredguy.png';
+    this.enemySpriteSheets.angryredguy.image.src = 'resources/sprites/enemies/angryredguy/angryredguy.png';
     this.loadEnemySpriteSheets();
 
     this.backgroundImage = {
       image: new Image(),
       loaded: false,
       layouts: [
-        'assets/sprites/environment/topexitcrustI.png',
-        'assets/sprites/environment/allexitcrustI.png',
+        'resources/sprites/environment/topexitcrustI.png',
+        'resources/sprites/environment/allexitcrustI.png',
       ],
       currentLayout: null,
       canvas: document.createElement('canvas'),
@@ -188,7 +188,7 @@ export class GameEngine {
   
   async loadConfig() {
     try {
-      this.config = await loadConfigXml('assets/data/config.xml');
+      this.config = await loadConfigXml('resources/data/config.xml');
       this.initGameState();
     } catch (err) {
       console.error('Failed to load config:', err);
@@ -255,13 +255,13 @@ export class GameEngine {
       height: this.canvas.clientHeight,
     };
     
-    // Load assets
-    const spriteSheetPath = getVal('assets > spriteSheet', 'assets/sprites/characters/character1.png');
-    const backgroundPath = getVal('assets > background', 'assets/sprites/environment/topexitcrustI.png');
+    // Load resources
+    const spriteSheetPath = getVal('resources > spriteSheet', 'resources/sprites/characters/character1.png');
+    const backgroundPath = getVal('resources > background', 'resources/sprites/environment/topexitcrustI.png');
     const layouts = [...new Set([
       backgroundPath,
-      'assets/sprites/environment/topexitcrustI.png',
-      'assets/sprites/environment/allexitcrustI.png',
+      'resources/sprites/environment/topexitcrustI.png',
+      'resources/sprites/environment/allexitcrustI.png',
     ])];
 
     this.backgroundImage.layouts = layouts;
@@ -320,12 +320,12 @@ export class GameEngine {
       height: this.canvas.clientHeight,
     };
     
-    this.spriteSheet.image.src = 'assets/sprites/characters/character1.png';
+    this.spriteSheet.image.src = 'resources/sprites/characters/character1.png';
     this.spriteSheet.image.onload = () => { this.spriteSheet.loaded = true; };
 
     this.backgroundImage.layouts = [
-      'assets/sprites/environment/topexitcrustI.png',
-      'assets/sprites/environment/allexitcrustI.png',
+      'resources/sprites/environment/topexitcrustI.png',
+      'resources/sprites/environment/allexitcrustI.png',
     ];
     this.loadRandomRoom();
   }
@@ -779,13 +779,13 @@ export class GameEngine {
 
   async loadEnemySpriteSheets() {
     try {
-      const response = await fetch('assets/sprites/enemies/spider/spider.json');
+      const response = await fetch('resources/sprites/enemies/spider/spider.json');
       const atlas = await response.json();
       this.enemySpriteSheets.spider.frames = this.parseSpriteAtlas(atlas);
       this.enemySpriteSheets.spider.image.onload = () => {
         this.enemySpriteSheets.spider.loaded = true;
       };
-      this.enemySpriteSheets.spider.image.src = 'assets/sprites/enemies/spider/spider.png';
+      this.enemySpriteSheets.spider.image.src = 'resources/sprites/enemies/spider/spider.png';
     } catch (err) {
       console.warn('Failed to load spider sprite atlas:', err);
     }

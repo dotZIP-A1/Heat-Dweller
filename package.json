@@ -1,7 +1,7 @@
 {
   "name": "heat-dweller",
   "version": "1.0.0",
-  "description": "A roguelike open-world space exploration game where you repair your ship, travel across planets, and survive RNG-based galaxies.",
+  "description": "A close-to-home roguelite game where you travel through your house as different characters, surive RNG situations where no exact playthrough is the same, and uncover the mystery behind the arsonist.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -21,7 +21,7 @@
     "electron-builder": "^24.0.0"
   },
   "build": {
-    "appId": "com.dotzip.echoofthevoid",
+    "appId": "com.dotzip.heatdweller",
     "productName": "Heat Dweller",
     "asar": false,
     "files": [

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bosses
+    gfxroot="resources/gfx/bosses/"
+    audioroot="resources/music/music/"
+>
+
+    <boss
+        id="1"
+        name="The Crawler"
+        floor="Attic"
+        health="180"
+        damage="3"
+        speed="1.0"
+        difficulty="9"
+
+        portrait="portraits/boss_001_thecrawler_portrait.png"
+
+        spritesheet="spritesheets/boss_001_thecrawler.png"
+        spritesheetjson="json/boss_001_thecrawler.json"
+
+        music="boss_attic.ogg"
+        rewardpool="secret"
+
+        description="Its crawling everywhere! It can be found in the Attic, and it has a 100% chance to drop items from the secret item pool due to its difficulty."
+    />
+
+</bosses>

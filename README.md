@@ -1,6 +1,6 @@
 # Heat Dweller
 
-A close-to-home rougelike game where you travel through your house as different characters, surive RNG situations where no exact playthrough is the same, and uncover the mystery behind the arsonist.
+A close-to-home roguelite game where you travel through your house as different characters, surive RNG situations where no exact playthrough is the same, and uncover the mystery behind the arsonist.
 
 ---
 

@@ -13,4 +13,9 @@ build/
 
 # confidential
 ideas.txt
-titlescript.txt
+
+# copilot skills
+copilot/
+
+# other
+desktop.ini
