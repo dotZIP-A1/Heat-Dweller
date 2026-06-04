@@ -6,10 +6,16 @@ import { loadHudAssets, drawHud } from '../systems/hudSystem.js';
 import { generateRoomGraph, debugPrintRoomGraph } from '../systems/mapGenerator.js';
 
 const ROOM_TYPE_BACKGROUNDS = {
-  normal: 'resources/sprites/environment/topexitcrustI.png',
-  shop: 'resources/sprites/environment/topexitcrustI.png',
-  boss: 'resources/sprites/environment/allexitcrustI.png',
-  special: 'resources/sprites/environment/allexitcrustI.png',
+  normal: 'resources/gfx/rooms/backgrounds/normal.png',
+  shop: 'resources/gfx/rooms/backgrounds/shop.png',
+  boss: 'resources/gfx/rooms/backgrounds/boss.png',
+  special: 'resources/gfx/rooms/backgrounds/special.png',
+};
+
+const ROOM_TYPE_ICONS = {
+  shop: 'resources/gfx/rooms/icons/shop.png',
+  boss: 'resources/gfx/rooms/icons/boss.png',
+  special: 'resources/gfx/rooms/icons/special.png',
 };
 
 // Heat Dweller - Main Game Engine

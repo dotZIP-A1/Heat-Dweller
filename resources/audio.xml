@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<roots
+<sounddata
     sfxroot="resources/music/sfx/"
     musicroot="resources/music/music/"
 >
 
-    <sfx
-        id="1"
-        name="Floor Transition"
-        audio="floor transition.wav"
-    />
+    <sfx id="1" name="Floor Transition" audio="floor_transition.wav" />
 
-    <sfx
-        id="2"
-        name="Find Item"
-        audio="find item.wav"
-    />
+    <sfx id="2" name="Find Item" audio="find_item.wav" />
 
-</roots>
+    <sfx id="3" name="Explosion" audio="explosion.wav" />
+
+</sounddata>
