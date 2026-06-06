@@ -149,7 +149,7 @@
     quality="2"
     itempool="secret,event,shop"
     image="resources/gfx/items/collectibles/collectibles_012_molotov.png"
-    active_effect="Throw a molotov that creates a temporary fire on the ground, damaging enemies that walk over it."
+    active_effect="Throw a molotov that creates a temporary fire on the ground, damaging monsters that walk over it."
     timedcooldown="45"
 />
 
@@ -161,7 +161,7 @@
     quality="2"
     itempool="secret,event,"
     image="resources/gfx/items/collectibles/collectibles_013_charger.png"
-    active_effect="Electrocute enemies for 50% of their health while doing leaving you with half a heart of health. Kills user if you have less than half a heart of health."
+    active_effect="Electrocute monsters for 50% of their health while doing leaving you with half a heart of health. Kills user if you have less than half a heart of health."
     timedcooldown="45"
 />
 
@@ -170,10 +170,10 @@
     name="Duality"
     description="Whats this do?"
     type="Active"
-    quality="2"
+    quality="4"
     itempool="secret,event,floor_reward"
     image="resources/gfx/items/collectibles/collectibles_014_duality.png"
-    active_effect="Reroll all of your current stats and passive items within their respective item pool. If you have no passive items, gain a random floor reward item instead."
+    active_effect="Reroll all of your current stats and passive items within their respective item pool. If you have no passive items, gain a random floor reward item instead. Atleast 2 stats will be higher than orignal."
     cooldown="5"
 />
 
@@ -185,7 +185,7 @@
     quality="2"
     itempool="secret,event,"
     image="resources/gfx/items/collectibles/collectibles_015_garlic.png"
-    effect="Breathe on enemies and posion them for 5 seconds, dealing rapid tick damage which concludes to 5 damage per second."
+    effect="Breathe on monsters and posion them for 5 seconds, dealing rapid tick damage which concludes to 5 damage per second."
 />
 
 <item 
@@ -197,6 +197,7 @@
     itempool="secret,event,"
     image="resources/gfx/items/collectibles/collectibles_016_snowman.png"
     active_effect="When taking damage, create a snowman familiar that shoots weak snowballs for 5 seconds."
+    cooldown="5"
 />
 
 <item 
@@ -229,7 +230,8 @@
     quality="2"
     itempool="cultistdeal"
     image="resources/gfx/items/collectibles/collectibles_019_cultistoath.png"
-    active_effect="Upon using the item, deal mass damage to all enemies in the room, but lose 1 heart of health. If you have less than 1 heart of health, you will have no hearts available (die in one hit) for the rest of the current floor."
+    active_effect="Upon using the item, deal mass damage to all monsters in the room, but lose 1 heart of health. If you have less than 1 heart of health, you will have no hearts available (die in one hit) for the rest of the current floor."
+    cooldown="5"
 />
 
 <item 
@@ -240,7 +242,7 @@
     quality="2"
     itempool="cultistdeal"
     image="resources/gfx/items/collectibles/collectibles_020_scythe.png"
-    effect="Split enemies in half. These halves will have half the health of the original enemy and will be 50% slower. This item does not work on bosses or mini-bosses."
+    effect="Split monsters in half. These halves will have half the health of the original enemy and will be 50% slower. This item does not work on bosses or mini-bosses."
 />
 
 <item 
@@ -252,6 +254,7 @@
     itempool="secret,event,floor-reward"
     image="resources/gfx/items/collectibles/collectibles_021_bread.png"
     active_effect="50% chance to fully heal yourself and gain temporary invincibility for 5 seconds. 50% chance to lose 1 heart of health. If you have less than 1 heart of health, you will have no hearts available (die in one hit) for the rest of the current floor."
+    cooldown="5"
 />
 
 <item 
@@ -273,10 +276,32 @@
     quality="4"
     itempool="secret,event,shop"
     image="resources/gfx/items/collectibles/collectibles_023_fireextinguisher.png"
-    effect="Replace Matthew's tears with a continuous stream of foam that does 15x Matthew's damage per second and has a high chance to cause the wet status effect, slowing enemies by 50% for 5 seconds."
+    effect="Replace Matthew's tears with a continuous stream of foam that does 15x Matthew's damage per second and has a high chance to cause the wet status effect, slowing monsters by 50% for 5 seconds."
     damage="2"
     health="-1"
 />
 
+<item 
+    id="24"
+    name="Mallet"
+    description="Smash smash smash! Ouch!"
+    type="Active"
+    quality="2"
+    itempool="secret,event,floor_reward"
+    image="resources/gfx/items/collectibles/collectibles_024_mallet.png"
+    active_effect="25% chance to do 25% of your damage to all monsters in the room. 75% chance to do leave you with half a heart. If you have less than half a heart of health, you will have no hearts available (die in one hit) for the rest of the current floor. Chance for sucessful hits scale with luck."
+    cooldown="5"
+/>
+
+<item 
+    id="25"
+    name="Monocle"
+    description="Mm... fancy!"
+    type="Passive"
+    quality="1"
+    itempool="secret,event,"
+    image="resources/gfx/items/collectibles/collectibles_025_monocle.png"
+    effect="10% chance to reflect block damage from an attack. Chance to block scales with luck."
+/>
 
 </items>

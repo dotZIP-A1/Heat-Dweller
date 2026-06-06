@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <entities
-    gfxroot="resources/gfx/enemies/"
-    jsonroot="resources/gfx/enemies/json/"
+    gfxroot="resources/gfx/monsters/"
+    jsonroot="resources/gfx/monsters/json/"
 >
 <!-- Damage is a decimal value representing the amount of hearts the enemy deals per hit: 0.5 damage is half a heart, 1.0 is a full heart. -->
 <!-- Health is a decimal value representing the amount of health the enemy has. This is dealt by the damage that the character has. -->

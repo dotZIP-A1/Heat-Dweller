@@ -103,10 +103,10 @@ void GameEngine::LoadResources() {
     if (resourceLoader_.LoadAll("resources")) {
         itemManager_.Initialize(resourceLoader_.Items());
         audioManager_.Initialize(resourceLoader_.Sounds());
-        // potential later use: resourceLoader_.Enemies()
+        // potential later use: resourceLoader_.monsters()
         std::cerr << "Loaded resources: items=" << resourceLoader_.Items().size()
                   << " sounds=" << resourceLoader_.Sounds().size()
-                  << " enemies=" << resourceLoader_.Enemies().size() << "\n";
+                  << " monsters=" << resourceLoader_.monsters().size() << "\n";
     } else {
         std::cerr << "ResourceLoader failed to load resources/" << std::endl;
     }

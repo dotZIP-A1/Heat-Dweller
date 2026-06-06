@@ -62,7 +62,7 @@ bool ResourceLoader::LoadAll(const std::string& resourcesPath) {
         je["properties"] = e.properties;
         jenemies.push_back(je);
     }
-    WriteJson(base, "enemies.json", jenemies);
+    WriteJson(base, "monsters.json", jenemies);
 
     return true;
 }
@@ -98,7 +98,7 @@ void ResourceLoader::ParseFile(const std::string& path) {
         ParseItems(content);
     } else if (filename.find("audio") != std::string::npos || filename.find("sound") != std::string::npos) {
         ParseSounds(content);
-    } else if (filename.find("enemy") != std::string::npos || filename.find("enemies") != std::string::npos) {
+    } else if (filename.find("enemy") != std::string::npos || filename.find("monsters") != std::string::npos) {
         ParseEnemies(content);
     } else {
         // try all parsers conservatively

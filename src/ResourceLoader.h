@@ -13,7 +13,7 @@ public:
 
     const std::vector<Item>& Items() const { return items_; }
     const std::vector<Sound>& Sounds() const { return sounds_; }
-    const std::vector<Enemy>& Enemies() const { return enemies_; }
+    const std::vector<Enemy>& monsters() const { return enemies_; }
 
 private:
     void ParseFile(const std::string& path);

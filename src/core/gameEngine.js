@@ -69,7 +69,7 @@ export class GameEngine {
     this.swordSwingAudio.volume = 0.5;
 
     this.enemySpriteSheets = {
-      angryredguy: {
+      crayn: {
         image: new Image(),
         frames: [{ x: 0, y: 0, w: 64, h: 64 }],
         loaded: false,
@@ -81,10 +81,10 @@ export class GameEngine {
       },
     };
 
-    this.enemySpriteSheets.angryredguy.image.onload = () => {
-      this.enemySpriteSheets.angryredguy.loaded = true;
+    this.enemySpriteSheets.crayn.image.onload = () => {
+      this.enemySpriteSheets.crayn.loaded = true;
     };
-    this.enemySpriteSheets.angryredguy.image.src = 'resources/gfx/enemies/angryredguy/angryredguy.png';
+    this.enemySpriteSheets.crayn.image.src = 'resources/gfx/monsters/Crayn.png';
     this.loadEnemySpriteSheets();
 
     this.backgroundImage = {
@@ -517,7 +517,7 @@ export class GameEngine {
     const margin = 96;
     const width = this.camera.width;
     const height = this.camera.height;
-    const enemyTypes = ['angryredguy', 'spider'];
+    const enemyTypes = ['crayn', 'spider'];
 
     return Array.from({ length: count }, (_, index) => {
       const type = enemyTypes[index % enemyTypes.length];
@@ -527,9 +527,9 @@ export class GameEngine {
         y: Math.floor(Math.random() * (height - margin * 2) + margin),
         width: 64,
         height: 64,
-        speed: type === 'angryredguy' ? 140 : 100,
-        health: type === 'angryredguy' ? 65 : 28,
-        damage: type === 'angryredguy' ? 18 : 10,
+        speed: type === 'crayn' ? 140 : 100,
+        health: type === 'crayn' ? 65 : 28,
+        damage: type === 'crayn' ? 18 : 10,
         alertRadius: 160,
         loseRadius: 240,
         wanderTime: Math.random() * 2 + 1.5,
@@ -540,7 +540,7 @@ export class GameEngine {
         spriteSheet: this.enemySpriteSheets[type],
         frameTime: 0,
         frameIndex: 0,
-        color: type === 'angryredguy' ? '#c92a2a' : '#8e44ad',
+        color: type === 'crayn' ? '#c92a2a' : '#8e44ad',
       };
     });
   }
@@ -554,7 +554,7 @@ export class GameEngine {
       const sheet = enemy.spriteSheet;
       const frameCount = sheet && sheet.frames ? sheet.frames.length : 0;
       const frameIndex = frameCount > 0 ? enemy.frameIndex % frameCount : 0;
-      const flip = enemy.type === 'angryredguy' && enemy.x > this.player.x;
+      const flip = enemy.type === 'crayn' && enemy.x > this.player.x;
 
       if (sheet && sheet.loaded && frameCount) {
         drawSpriteFrame(this.ctx, sheet, frameIndex, drawX, drawY, flip);
@@ -665,7 +665,7 @@ export class GameEngine {
       visited: false,
       cleared: false,
       type: roomType,
-      enemies: this.generateRoomEnemies(),
+      monsters: this.generateRoomEnemies(),
       items: [],
       backgroundLayout: ROOM_TYPE_BACKGROUNDS[roomType] || ROOM_TYPE_BACKGROUNDS.normal,
     };
@@ -691,7 +691,7 @@ export class GameEngine {
     this.backgroundImage.layouts = [layout];
     this.loadRoomImage(layout);
 
-    this.roomEnemies = roomState.cleared ? [] : roomState.enemies;
+    this.roomEnemies = roomState.cleared ? [] : roomState.monsters;
 
     if (entryDirection) {
       const spawn = this.findRoomEntryPosition(entryDirection);
@@ -724,7 +724,7 @@ export class GameEngine {
     };
 
     for (const enemy of this.roomEnemies) {
-      if (enemy.type === 'angryredguy') {
+      if (enemy.type === 'crayn') {
         this.updateChaserEnemy(enemy, delta);
       } else if (enemy.type === 'spider') {
         this.updateWandererEnemy(enemy, delta);
@@ -748,7 +748,7 @@ export class GameEngine {
     this.roomEnemies = this.roomEnemies.filter(e => e.alive);
     if (this.currentRoomId !== null) {
       const roomState = this.getRoomState(this.currentRoomId);
-      roomState.enemies = this.roomEnemies;
+      roomState.monsters = this.roomEnemies;
       roomState.cleared = this.roomEnemies.length === 0;
     }
   }
@@ -869,13 +869,13 @@ export class GameEngine {
 
   async loadEnemySpriteSheets() {
     try {
-      const response = await fetch('resources/gfx/enemies/json/entity_002_scar.json');
+      const response = await fetch('resources/gfx/monsters/json/entity_002_scar.json');
       const atlas = await response.json();
       this.enemySpriteSheets.spider.frames = this.parseSpriteAtlas(atlas);
       this.enemySpriteSheets.spider.image.onload = () => {
         this.enemySpriteSheets.spider.loaded = true;
       };
-      this.enemySpriteSheets.spider.image.src = 'resources/gfx/enemies/spritesheets/entity_002_scar.png';
+      this.enemySpriteSheets.spider.image.src = 'resources/gfx/monsters/spritesheets/entity_002_scar.png';
     } catch (err) {
       console.warn('Failed to load spider sprite atlas:', err);
     }
@@ -902,7 +902,7 @@ export class GameEngine {
     if (!this.roomEnemies.length) return;
 
     for (const enemy of this.roomEnemies) {
-      if (enemy.type === 'angryredguy') {
+      if (enemy.type === 'crayn') {
         this.updateChaserEnemy(enemy, delta);
       } else if (enemy.type === 'spider') {
         this.updateWandererEnemy(enemy, delta);
